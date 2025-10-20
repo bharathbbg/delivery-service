@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package delivery;
+option go_package = "github.com/bharathbbg/delivery-service/proto/delivery";
+
+import "common.proto";
+
+service DeliveryService {
+  rpc CreateDelivery(CreateDeliveryRequest) returns (DeliveryResponse) {}
+  rpc GetDelivery(GetDeliveryRequest) returns (DeliveryResponse) {}
+  rpc UpdateDelivery(UpdateDeliveryRequest) returns (DeliveryResponse) {}
+  rpc ListDeliveries(ListDeliveriesRequest) returns (ListDeliveriesResponse) {}
+  rpc TrackDelivery(TrackDeliveryRequest) returns (TrackDeliveryResponse) {}
+}
+
+message Delivery {
+  string id = 1;
+  string order_id = 2;
+  common.Address shipping_address = 3;
+  string courier_id = 4;
+  string status = 5;
+  string tracking_number = 6;
+  common.Timestamp estimated_delivery_time = 7;
+  common.Timestamp actual_delivery_time = 8;
+  common.Timestamp created_at = 9;
+  common.Timestamp updated_at = 10;
+}
+
+message DeliveryEvent {
+  string id = 1;
+  string delivery_id = 2;
+  string status = 3;
+  string location = 4;
+  string description = 5;
+  common.Timestamp timestamp = 6;
+}
+
+message CreateDeliveryRequest {
+  string order_id = 1;
+  common.Address shipping_address = 2;
+}
+
+message GetDeliveryRequest {
+  string id = 1;
+}
+
+message UpdateDeliveryRequest {
+  string id = 1;
+  string status = 2;
+  string location = 3;
+  string description = 4;
+}
+
+message ListDeliveriesRequest {
+  string order_id = 1;
+  int32 page = 2;
+  int32 page_size = 3;
+}
+
+message TrackDeliveryRequest {
+  string tracking_number = 1;
+}
+
+message DeliveryResponse {
+  Delivery delivery = 1;
+}
+
+message ListDeliveriesResponse {
+  repeated Delivery deliveries = 1;
+  int32 total = 2;
+}
+
+message TrackDeliveryResponse {
+  Delivery delivery = 1;
+  repeated DeliveryEvent events = 2;
+}
