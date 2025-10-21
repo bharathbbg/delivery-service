@@ -10,11 +10,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/bharathbbg/delivery-service/internal/api/grpc"
-	"github.com/bharathbbg/delivery-service/internal/api/rest"
 	"github.com/bharathbbg/delivery-service/internal/config"
 	"github.com/bharathbbg/delivery-service/internal/repository"
 	"github.com/bharathbbg/delivery-service/internal/service"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -38,10 +37,11 @@ func main() {
 	defer cache.Close()
 
 	// Initialize service
-	svc := service.NewDeliveryService(repo, cache)
+	// Initialize service
+	service.NewDeliveryService(repo, cache)
 
 	// Initialize gRPC server
-	grpcServer := grpc.NewServer(svc)
+	grpcServer := grpc.NewServer()
 	go func() {
 		lis, err := net.Listen("tcp", cfg.GRPCAddr)
 		if err != nil {
@@ -54,12 +54,15 @@ func main() {
 	}()
 
 	// Initialize REST server
-	router := rest.NewRouter(svc)
+	router := http.NewServeMux()
+	// basic health check endpoint
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	server := &http.Server{
 		Addr:    cfg.HTTPAddr,
 		Handler: router,
 	}
-
 	// Start HTTP server
 	go func() {
 		log.Printf("REST server listening on %s", cfg.HTTPAddr)
