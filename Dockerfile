@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine as builder
+FROM golang:1.25-alpine as builder
 
 WORKDIR /app
 
@@ -28,7 +28,7 @@ RUN adduser -D -g '' appuser
 USER appuser
 
 # Expose HTTP and gRPC ports
-EXPOSE 8081 50052
+EXPOSE 8080 50051
 
 # Run the application
 CMD ["./delivery-service"]
